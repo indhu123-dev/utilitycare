@@ -1,9 +1,6 @@
 import streamlit as st
+from pathlib import Path
 from uuid import uuid4
-
-# ==========================================
-# 1. PAGE SETTINGS
-# ==========================================
 
 st.set_page_config(
     page_title="UtilityCare",
@@ -11,15 +8,116 @@ st.set_page_config(
     layout="wide"
 )
 
-# ==========================================
-# 2. SIDEBAR NAVIGATION
-# ==========================================
+# ---------- DESIGN ----------
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(135deg, #071522, #102d40, #071522);
+    color: #f4f8fb;
+}
+[data-testid="stSidebar"] {
+    background: #081b2a;
+}
+h1, h2, h3 { color: #f4f8fb; }
+[data-testid="stMetric"] {
+    background: #102b3c;
+    border: 1px solid #285064;
+    padding: 16px;
+    border-radius: 14px;
+}
+[data-testid="stMetricValue"] { color: #42dfcc; }
+.stButton button, .stFormSubmitButton button {
+    background: #38d6c3;
+    color: #071522;
+    border-radius: 9px;
+    font-weight: bold;
+    border: none;
+}
+.uc-card {
+    background: #10283a;
+    border: 1px solid #285064;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+}
+.uc-label {
+    color: #42dfcc;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+</style>
+""", unsafe_allow_html=True)
 
-st.sidebar.title("⚡ UtilityCare")
-st.sidebar.caption("Utilities That Explain Themselves")
+# ---------- PICTURES ----------
+# Optional: create utilitycare_assets beside app.py and add these files.
+# If a local picture is missing, the app tries an online picture instead.
+ASSETS = Path(__file__).resolve().parent / "utilitycare_assets"
 
-pages = [
-    "Home",
+PICTURES = {
+    "Home Dashboard": (
+        "home_dashboard.png",
+        "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Smart Bill Explainer": (
+        "smart_bill_explainer.png",
+        "https://images.unsplash.com/photo-1554224155-6726b3ff858f"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Bill Reading Verification": (
+        "bill_reading_verification.png",
+        "https://images.unsplash.com/photo-1621905251918-48416bd8575a"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Safe Payment Tracker": (
+        "safe_payment_tracker.png",
+        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Outage Reporting": (
+        "outage_reporting.png",
+        "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Tenant Support": (
+        "tenant_support.png",
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+    "Priority Customer Support": (
+        "priority_customer_support.png",
+        "https://images.unsplash.com/photo-1521737711867-e3b97375f902"
+        "?auto=format&fit=crop&w=1200&q=80"
+    ),
+}
+
+def show_picture(feature, width=None):
+    filename, url = PICTURES[feature]
+    local_file = ASSETS / filename
+
+    if local_file.is_file():
+        st.image(str(local_file), use_container_width=True)
+    else:
+        try:
+            st.image(url, use_container_width=True)
+        except Exception:
+            st.info("Picture unavailable. The feature still works.")
+
+def hero(number, title, subtitle):
+    st.markdown(
+        f'<p class="uc-label">UTILITYCARE / {number:02d}</p>'
+        f'<h1>{title}</h1><p>{subtitle}</p>',
+        unsafe_allow_html=True
+    )
+    st.divider()
+
+def money(value):
+    return f"₹{value:,.2f}"
+
+# ---------- NAVIGATION ----------
+PAGES = [
+    "Home Dashboard",
     "Smart Bill Explainer",
     "Bill Reading Verification",
     "Safe Payment Tracker",
@@ -28,547 +126,320 @@ pages = [
     "Priority Customer Support"
 ]
 
-page = st.sidebar.radio("Choose a feature", pages)
+with st.sidebar:
+    st.markdown("# ⚡ UtilityCare")
+    st.caption("UTILITIES THAT EXPLAIN THEMSELVES")
+    st.divider()
+    page = st.radio("Choose a feature", PAGES)
+    st.divider()
+    st.success("DEMO MODE")
+    st.caption("No live bank or utility provider is connected.")
+    st.caption("IMPACTX 2026 · Round 2")
 
-st.title("⚡ UtilityCare")
-st.subheader("Utilities That Explain Themselves")
-st.caption("IMPACTX 2026 Hackathon | Problem 18")
-st.divider()
+st.markdown("## ⚡ UtilityCare")
+st.caption("Understand bills. Verify readings. Get clearer next steps.")
 
-# ==========================================
-# 3. HOME
-# ==========================================
+# ---------- 1. HOME DASHBOARD ----------
+if page == "Home Dashboard":
+    hero(1, "Utilities, made clearer.",
+         "Understand the numbers, check the details, and know what to do next.")
 
-if page == "Home":
+    show_picture(page)
 
-    st.header("Welcome to UtilityCare")
+    a, b, c = st.columns(3)
+    a.metric("Core features", "7")
+    b.metric("Live integrations", "0")
+    c.metric("Transparent scoring", "Rule-based")
 
-    st.write(
-        "UtilityCare helps people understand utility bills, "
-        "verify meter readings, track payment problems, "
-        "report outages, and manage complaints."
-    )
+    st.subheader("Explore your workspace")
 
-    st.info(
-        "Hackathon prototype: all calculations and reports use "
-        "demo data. No real utility, bank, or support system is connected."
-    )
+    descriptions = [
+        ("🧾", "Smart Bill Explainer",
+         "Understand charges, taxes and your estimated bill."),
+        ("🔎", "Bill Reading Verification",
+         "Compare meter readings against billed usage."),
+        ("💳", "Safe Payment Tracker",
+         "Understand payment status differences."),
+        ("⚡", "Outage Reporting",
+         "Prepare a clear electricity outage report."),
+        ("🏠", "Tenant Support",
+         "Organize utility complaints and requests."),
+        ("🚦", "Priority Customer Support",
+         "See how a transparent priority score is calculated.")
+    ]
 
-    col1, col2 = st.columns(2)
+    cols = st.columns(3)
+    for i, (icon, title, desc) in enumerate(descriptions):
+        with cols[i % 3]:
+            st.markdown(
+                f'<div class="uc-card"><h3>{icon} {title}</h3>'
+                f'<p>{desc}</p></div>',
+                unsafe_allow_html=True
+            )
 
-    with col1:
-        st.markdown("### 🧾 Smart Bill Explainer")
-        st.write("Understand bill amounts and possible reasons for increases.")
+    st.info("Demo only: reports are not sent to providers or permanently stored.")
 
-        st.markdown("### 🔍 Bill Reading Verification")
-        st.write("Compare meter readings with billed units.")
-
-        st.markdown("### 💳 Safe Payment Tracker")
-        st.write("Understand payment status mismatches.")
-
-    with col2:
-        st.markdown("### ⚡ Outage Reporting")
-        st.write("Create a sample electricity outage report.")
-
-        st.markdown("### 🏠 Tenant Support")
-        st.write("Create a utility-related tenant complaint.")
-
-        st.markdown("### 🚨 Priority Customer Support")
-        st.write("Identify complaints that may require urgent attention.")
-
-# ==========================================
-# 4. SMART BILL EXPLAINER
-# ==========================================
-
+# ---------- 2. SMART BILL EXPLAINER ----------
 elif page == "Smart Bill Explainer":
+    hero(2, page, "Understand each part of your electricity bill.")
+    show_picture(page)
 
-    st.header("🧾 Smart Bill Explainer")
+    left, right = st.columns(2)
+    with left:
+        units = st.number_input("Units used (kWh)", min_value=0.0, value=200.0)
+        rate = st.number_input("Sample rate per unit (₹)", min_value=0.0, value=6.0)
+        fixed = st.number_input("Fixed charges (₹)", min_value=0.0, value=100.0)
+    with right:
+        tax_rate = st.number_input("Sample tax (%)", min_value=0.0, value=5.0)
+        dues = st.number_input("Previous dues (₹)", min_value=0.0, value=0.0)
+        adjustment = st.number_input("Adjustment (₹)", value=0.0)
+        usual = st.number_input("Usual bill (₹)", min_value=1.0, value=1000.0)
 
-    st.write("Enter sample bill details to calculate the estimated amount.")
+    reading = st.selectbox("Reading type", ["Actual", "Estimated", "Unknown"])
 
-    col1, col2 = st.columns(2)
+    if st.button("Explain my bill", type="primary"):
+        energy = units * rate
+        tax = (energy + fixed) * tax_rate / 100
+        total = energy + fixed + tax + dues + adjustment
 
-    with col1:
-        units = st.number_input(
-            "Units consumed (kWh)", min_value=0.0,
-            value=200.0, step=10.0
-        )
-        rate = st.number_input(
-            "Sample rate per unit (₹)", min_value=0.0,
-            value=6.0, step=0.5
-        )
-        fixed_charge = st.number_input(
-            "Fixed charges (₹)", min_value=0.0,
-            value=100.0, step=10.0
-        )
-        tax_percent = st.number_input(
-            "Sample tax (%)", min_value=0.0,
-            value=5.0, step=1.0
-        )
-
-    with col2:
-        arrears = st.number_input(
-            "Previous dues (₹)", min_value=0.0,
-            value=0.0, step=50.0
-        )
-        adjustment = st.number_input(
-            "Other adjustment (₹)", value=0.0, step=10.0
-        )
-        usual_bill = st.number_input(
-            "Usual monthly bill (₹)", min_value=1.0,
-            value=1000.0, step=100.0
-        )
-        reading_type = st.selectbox(
-            "Meter reading type", ["Actual", "Estimated", "Unknown"]
-        )
-        estimated_months = st.number_input(
-            "Consecutive estimated months",
-            min_value=0, value=0, step=1
-        )
-
-    if st.button("Explain My Bill", type="primary"):
-
-        energy_charge = units * rate
-        subtotal = energy_charge + fixed_charge
-        tax = subtotal * tax_percent / 100
-        total = subtotal + tax + arrears + adjustment
-
-        st.subheader("Bill Breakdown")
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Energy Charge", f"₹{energy_charge:.2f}")
-        c2.metric("Tax", f"₹{tax:.2f}")
-        c3.metric("Estimated Total", f"₹{total:.2f}")
-
-        st.write(f"Fixed charges: ₹{fixed_charge:.2f}")
-        st.write(f"Previous dues: ₹{arrears:.2f}")
-        st.write(f"Other adjustment: ₹{adjustment:.2f}")
-
-        if total >= 2 * usual_bill:
-            st.warning(
-                "Your entered bill is at least twice your usual bill. "
-                "Review the units, rates, dues, and adjustments."
-            )
+        if total < 0:
+            st.error("The total is negative. Please check the adjustment.")
         else:
-            st.success(
-                "Your entered bill is less than twice your usual bill. "
-                "Review the breakdown to understand the amount."
-            )
+            st.subheader("Your bill breakdown")
+            a, b, c = st.columns(3)
+            a.metric("Energy charge", money(energy))
+            b.metric("Tax estimate", money(tax))
+            c.metric("Estimated total", money(total))
 
-        if reading_type == "Estimated":
+            st.write("| Charge | Amount |")
+            st.write("|---|---:|")
+            for label, amount in [
+                ("Energy", energy), ("Fixed charges", fixed),
+                ("Tax", tax), ("Previous dues", dues),
+                ("Adjustment", adjustment)
+            ]:
+                st.write(f"| {label} | {money(amount)} |")
+
             st.write(
-                "• The bill uses an estimated reading. Compare it "
-                "with an actual meter reading if available."
+                f"You entered {units:g} units at a sample rate of "
+                f"{money(rate)} per unit."
             )
+            if total >= 2 * usual:
+                st.warning("This estimate is at least twice your usual bill. Review the entries.")
+            if reading == "Estimated":
+                st.info("Check the bill against an actual meter reading if possible.")
+            elif reading == "Unknown":
+                st.info("Check your bill to confirm whether the reading was estimated.")
+            if dues > 0:
+                st.info("Confirm previous dues against earlier bills.")
 
-        if reading_type == "Unknown":
-            st.write("• Check whether the bill uses an actual or estimated reading.")
+            st.caption("Illustrative calculation, not an official tariff.")
 
-        if estimated_months >= 2:
-            st.write(
-                "• Several estimated bills in a row may need review."
-            )
-
-        if arrears > 0:
-            st.write("• Previous dues contribute to the total.")
-
-        if adjustment != 0:
-            st.write("• An additional adjustment affects the total.")
-
-        st.caption(
-            "Sample calculation only. This does not prove that a bill is incorrect."
-        )
-
-# ==========================================
-# 5. BILL READING VERIFICATION
-# ==========================================
-
+# ---------- 3. BILL READING VERIFICATION ----------
 elif page == "Bill Reading Verification":
+    hero(3, page, "Compare meter usage with the units shown on your bill.")
+    show_picture(page)
 
-    st.header("🔍 Bill Reading Verification")
+    a, b = st.columns(2)
+    with a:
+        previous = st.number_input("Previous reading", min_value=0.0, value=1200.0)
+        current = st.number_input("Current reading", min_value=0.0, value=1800.0)
+    with b:
+        billed = st.number_input("Billed units", min_value=0.0, value=650.0)
+        tolerance = st.number_input("Allowed difference", min_value=0.0, value=1.0)
 
-    st.write("Compare meter readings with the units printed on the bill.")
-
-    previous_reading = st.number_input(
-        "Previous meter reading", min_value=0.0,
-        value=1200.0, step=10.0
-    )
-
-    current_reading = st.number_input(
-        "Current meter reading", min_value=0.0,
-        value=1800.0, step=10.0
-    )
-
-    billed_units = st.number_input(
-        "Units shown on bill", min_value=0.0,
-        value=650.0, step=10.0
-    )
-
-    tolerance = st.number_input(
-        "Allowed difference (units)", min_value=0.0,
-        value=1.0, step=1.0
-    )
-
-    if st.button("Verify Reading", type="primary"):
-
-        if current_reading < previous_reading:
-            st.error(
-                "Current reading is lower than the previous reading. "
-                "Check the entries or whether the meter was reset or replaced."
-            )
+    if st.button("Verify reading", type="primary"):
+        if current < previous:
+            st.error("Current reading is lower than previous reading. Check the entries.")
         else:
-            calculated_units = current_reading - previous_reading
-            difference = abs(calculated_units - billed_units)
-
-            c1, c2, c3 = st.columns(3)
-            c1.metric("Calculated Usage", f"{calculated_units:.2f}")
-            c2.metric("Billed Usage", f"{billed_units:.2f}")
-            c3.metric("Difference", f"{difference:.2f}")
+            usage = current - previous
+            difference = abs(usage - billed)
+            a, b, c = st.columns(3)
+            a.metric("Calculated usage", f"{usage:.2f}")
+            b.metric("Billed units", f"{billed:.2f}")
+            c.metric("Difference", f"{difference:.2f}")
 
             if difference <= tolerance:
-                st.success("The readings match within the selected tolerance.")
+                st.success("Readings match within the selected tolerance.")
             else:
-                st.warning(
-                    "A difference was detected. Check the readings, "
-                    "billing dates, and any meter multiplier."
-                )
+                st.warning("A difference was detected. Check dates, readings and meter multiplier.")
+            st.caption("A difference does not automatically prove a billing error.")
 
-            st.caption(
-                "A difference needs investigation; it does not automatically prove an error."
-            )
-
-# ==========================================
-# 6. SAFE PAYMENT TRACKER
-# ==========================================
-
+# ---------- 4. SAFE PAYMENT TRACKER ----------
 elif page == "Safe Payment Tracker":
+    hero(4, page, "Check sample payment statuses before taking your next step.")
+    show_picture(page)
 
-    st.header("💳 Safe Payment Tracker")
+    reference = st.text_input("Transaction reference", "TXN10025")
+    amount = st.number_input("Payment amount (₹)", min_value=1.0, value=1500.0)
+    a, b = st.columns(2)
+    with a:
+        bank = st.selectbox("Bank / payment app status",
+                            ["Successful", "Pending", "Failed"])
+    with b:
+        portal = st.selectbox("Utility portal status",
+                              ["Paid", "Unpaid", "Update Pending"])
 
-    st.write("Compare the entered bank status with the utility portal status.")
+    if st.button("Check payment status", type="primary"):
+        a, b, c = st.columns(3)
+        a.metric("Amount", money(amount))
+        b.metric("Bank status", bank)
+        c.metric("Portal status", portal)
+        st.write(f"Reference: `{reference or 'Not entered'}`")
 
-    reference = st.text_input(
-        "Payment reference (demo)", placeholder="Example: PAY12345"
-    )
-
-    amount = st.number_input(
-        "Payment amount (₹)", min_value=0.0,
-        value=500.0, step=50.0
-    )
-
-    bank_status = st.selectbox(
-        "Bank or payment app status",
-        ["Successful", "Pending", "Failed"]
-    )
-
-    portal_status = st.selectbox(
-        "Utility portal status",
-        ["Paid", "Unpaid", "Update Pending"]
-    )
-
-    if st.button("Check Payment", type="primary"):
-
-        st.subheader("Payment Status Guidance")
-
-        if bank_status == "Successful" and portal_status == "Paid":
-            st.success(
-                "Both statuses show success. Keep your payment receipt."
-            )
-
-        elif bank_status == "Successful":
+        if bank == "Successful" and portal == "Paid":
+            st.success("Both sample statuses show payment success. Keep your receipt.")
+        elif bank == "Successful":
             st.warning(
-                "The bank shows success, but the portal does not show Paid. "
-                "Keep the receipt, check the reference, and contact official "
-                "support if needed. Avoid paying again immediately."
+                "Bank shows success, but the portal does not. Keep your receipt, "
+                "check with official support, and avoid paying again immediately."
             )
-
-        elif bank_status == "Pending":
-            st.info(
-                "The payment is pending. Check with your bank or payment app "
-                "before attempting another payment."
-            )
-
+        elif bank == "Pending":
+            st.info("Check the final status with your bank or payment app before retrying.")
         else:
-            st.warning(
-                "The payment is marked failed. Verify its final status with "
-                "your bank before trying again."
-            )
+            st.warning("Confirm the final status with your bank before attempting another payment.")
 
-        st.write(f"Reference: {reference or 'Not entered'}")
-        st.write(f"Entered amount: ₹{amount:.2f}")
+        st.caption("Demo statuses only. No real transaction is checked.")
 
-        st.caption("Demo only. No real transaction is verified.")
-
-# ==========================================
-# 7. OUTAGE REPORTING
-# ==========================================
-
+# ---------- 5. OUTAGE REPORTING ----------
 elif page == "Outage Reporting":
-
-    st.header("⚡ Outage Reporting")
-
-    st.write("Create a demonstration report for an electricity problem.")
+    hero(5, page, "Prepare a clear report about an electricity interruption.")
+    show_picture(page)
 
     with st.form("outage_form"):
-
         area = st.text_input("Area or locality")
-
-        issue_type = st.selectbox(
-            "Type of issue",
-            [
-                "Power cut",
-                "Low voltage",
-                "Frequent power interruptions",
-                "Other"
-            ]
-        )
-
+        issue = st.selectbox("Issue type", [
+            "Power cut", "Low voltage",
+            "Frequent interruptions", "Other"
+        ])
         households = st.number_input(
-            "Estimated households affected",
-            min_value=1, value=25, step=1
+            "Households affected", min_value=1, value=25
         )
-
         details = st.text_area("Describe the problem")
+        submit = st.form_submit_button("Create demo report")
 
-        submit_outage = st.form_submit_button("Create Demo Report")
-
-    if submit_outage:
-
+    if submit:
         if not area.strip() or not details.strip():
-            st.error("Please enter the area and describe the problem.")
+            st.error("Please enter the area and problem details.")
         else:
             report_id = "OUTAGE-" + uuid4().hex[:8].upper()
-
-            st.success("Demo outage report created!")
-
-            st.subheader("Report Summary")
-            st.write(f"**Reference:** {report_id}")
+            st.success("Demo report prepared.")
+            st.subheader(f"Reference: {report_id}")
             st.write(f"**Area:** {area}")
-            st.write(f"**Issue:** {issue_type}")
+            st.write(f"**Issue:** {issue}")
             st.write(f"**Households affected:** {households}")
             st.write(f"**Details:** {details}")
+            st.info("This report has not been sent to an electricity provider.")
 
-            st.info(
-                "Demo only: this report has not been sent to an electricity provider."
-            )
-
-# ==========================================
-# 8. TENANT SUPPORT
-# ==========================================
-
+# ---------- 6. TENANT SUPPORT ----------
 elif page == "Tenant Support":
-
-    st.header("🏠 Tenant Support")
-
-    st.write("Create a sample complaint about a utility or accommodation issue.")
+    hero(6, page, "Organize utility-related tenant concerns.")
+    show_picture(page)
 
     with st.form("tenant_form"):
-
-        tenant_name = st.text_input("Tenant name (demo)")
+        name = st.text_input("Tenant name")
         location = st.text_input("Building or area")
-
-        category = st.selectbox(
-            "Complaint category",
-            [
-                "Electricity issue",
-                "Water supply issue",
-                "Billing dispute",
-                "Maintenance request",
-                "Payment issue",
-                "Other"
-            ]
+        category = st.selectbox("Complaint category", [
+            "Electricity issue", "Water supply issue", "Billing dispute",
+            "Maintenance request", "Payment issue", "Other"
+        ])
+        priority = st.select_slider(
+            "Requested priority",
+            options=["Low", "Medium", "High"],
+            value="Medium"
         )
+        details = st.text_area("Complaint details")
+        submit = st.form_submit_button("Prepare demo complaint")
 
-        priority = st.selectbox("Complaint priority", ["Low", "Medium", "High"])
-
-        description = st.text_area("Complaint details")
-
-        submit_tenant = st.form_submit_button("Submit Demo Complaint")
-
-    if submit_tenant:
-
-        if not tenant_name.strip() or not location.strip() or not description.strip():
-            st.error("Please complete the name, location, and complaint details.")
+    if submit:
+        if not name.strip() or not location.strip() or not details.strip():
+            st.error("Complete the name, location and complaint details.")
         else:
             complaint_id = "TENANT-" + uuid4().hex[:8].upper()
-
-            st.success("Demo complaint created!")
-
-            st.subheader("Complaint Summary")
-            st.write(f"**Reference:** {complaint_id}")
-            st.write(f"**Tenant:** {tenant_name}")
+            st.success("Demo complaint prepared.")
+            st.metric("Request reference", complaint_id)
+            st.write(f"**Tenant:** {name}")
             st.write(f"**Location:** {location}")
             st.write(f"**Category:** {category}")
             st.write(f"**Priority:** {priority}")
-            st.write(f"**Description:** {description}")
-            st.write("**Status:** Submitted in demo")
+            st.write(details)
+            st.info("This complaint is not permanently saved or sent to a support team.")
 
-            if priority == "High":
-                st.warning(
-                    "High priority selected. A real service would need an escalation process."
-                )
-            elif priority == "Medium":
-                st.info("Medium priority selected. Timely review is recommended.")
-            else:
-                st.info("Low priority selected. Normal review is recommended.")
-
-            st.caption(
-                "Demo only: this complaint is not saved permanently or sent to a real team."
-            )
-
-# ==========================================
-# 9. PRIORITY CUSTOMER SUPPORT
-# ==========================================
-
+# ---------- 7. PRIORITY CUSTOMER SUPPORT ----------
 elif page == "Priority Customer Support":
-
-    st.header("🚨 Priority Customer Support")
-
-    st.write(
-        "Evaluate a sample utility complaint and recommend "
-        "which cases may need attention first."
-    )
+    hero(7, page, "See how a transparent rule-based priority score works.")
+    show_picture(page)
 
     st.info(
-        "This prototype uses transparent rules, not AI or a real customer database."
+        "Demo scoring uses severity, people affected and duration. "
+        "It is not a trained AI model or official provider policy."
     )
 
-    with st.form("priority_support_form"):
+    with st.form("priority_form"):
+        complaint_type = st.selectbox("Complaint type", [
+            "Electricity outage", "Water supply failure",
+            "Billing problem", "Payment problem",
+            "Routine maintenance", "Other"
+        ])
+        severity = st.selectbox("Impact level", [
+            "Critical", "High", "Medium", "Low"
+        ])
+        people = st.number_input("People affected", min_value=1, value=1)
+        duration = st.selectbox("How long has it continued?", [
+            "Less than 1 hour", "1 to 6 hours",
+            "6 to 24 hours", "More than 24 hours"
+        ])
+        details = st.text_area("Describe the issue")
+        submit = st.form_submit_button("Evaluate priority")
 
-        complaint_type = st.selectbox(
-            "Complaint type",
-            [
-                "Electricity outage",
-                "Water supply failure",
-                "Billing problem",
-                "Payment problem",
-                "Routine maintenance",
-                "Other"
-            ]
-        )
-
-        severity = st.selectbox(
-            "Impact on the customer",
-            [
-                "Critical: essential service unavailable",
-                "High: major disruption",
-                "Medium: service partly affected",
-                "Low: minor or routine issue"
-            ]
-        )
-
-        affected_people = st.number_input(
-            "Estimated people affected",
-            min_value=1,
-            value=1,
-            step=1
-        )
-
-        duration = st.selectbox(
-            "How long has the issue continued?",
-            [
-                "Less than 1 hour",
-                "1 to 6 hours",
-                "6 to 24 hours",
-                "More than 24 hours"
-            ]
-        )
-
-        description = st.text_area(
-            "Additional details",
-            placeholder="Describe the issue briefly."
-        )
-
-        evaluate = st.form_submit_button(
-            "Evaluate Priority",
-            type="primary"
-        )
-
-    if evaluate:
-
-        if not description.strip():
-            st.error("Please provide a short description of the complaint.")
-
+    if submit:
+        if not details.strip():
+            st.error("Please describe the issue.")
         else:
-            # Transparent demonstration scoring rules
-            score = 0
+            severity_points = {
+                "Critical": 5, "High": 4, "Medium": 2, "Low": 1
+            }[severity]
+            people_points = (
+                3 if people >= 50 else
+                2 if people >= 10 else
+                1 if people >= 2 else 0
+            )
+            duration_points = {
+                "Less than 1 hour": 0,
+                "1 to 6 hours": 1,
+                "6 to 24 hours": 2,
+                "More than 24 hours": 3
+            }[duration]
 
-            if severity == "Critical: essential service unavailable":
-                score += 5
-            elif severity == "High: major disruption":
-                score += 4
-            elif severity == "Medium: service partly affected":
-                score += 2
-            else:
-                score += 1
+            score = severity_points + people_points + duration_points
+            result = "High" if score >= 8 else "Medium" if score >= 5 else "Low"
 
-            if affected_people >= 50:
-                score += 3
-            elif affected_people >= 10:
-                score += 2
-            elif affected_people >= 2:
-                score += 1
-
-            if duration == "More than 24 hours":
-                score += 3
-            elif duration == "6 to 24 hours":
-                score += 2
-            elif duration == "1 to 6 hours":
-                score += 1
-
-            if score >= 8:
-                result = "High"
-                recommendation = (
-                    "Recommend urgent human review. Check the scale of impact "
-                    "and follow the provider's escalation process."
-                )
-            elif score >= 5:
-                result = "Medium"
-                recommendation = (
-                    "Recommend timely review. Confirm the impact and arrange "
-                    "follow-up according to service procedures."
-                )
-            else:
-                result = "Low"
-                recommendation = (
-                    "Recommend normal review. Provide the customer with "
-                    "the appropriate next steps."
-                )
-
-            priority_id = "PRIORITY-" + uuid4().hex[:8].upper()
-
-            st.subheader("Priority Assessment")
-
-            c1, c2 = st.columns(2)
-            c1.metric("Demo Priority Score", f"{score}/11")
-            c2.metric("Recommended Priority", result)
-
-            st.write(f"**Reference:** {priority_id}")
+            a, b = st.columns(2)
+            a.metric("Rule-based score", f"{score}/11")
+            b.metric("Suggested review priority", result)
             st.write(f"**Complaint type:** {complaint_type}")
-            st.write(f"**People affected:** {affected_people}")
-            st.write(f"**Duration:** {duration}")
-            st.write(f"**Details:** {description}")
+            st.write(f"**Details:** {details}")
+            st.markdown("### Why this score?")
+            st.write(f"- Severity: {severity_points} points")
+            st.write(f"- People affected: {people_points} points")
+            st.write(f"- Duration: {duration_points} points")
 
             if result == "High":
-                st.error(recommendation)
+                st.error("Recommend urgent human review.")
             elif result == "Medium":
-                st.warning(recommendation)
+                st.warning("Recommend timely review.")
             else:
-                st.success(recommendation)
+                st.success("Recommend normal review.")
 
-            st.caption(
-                "This score is a hackathon demonstration, not an official "
-                "service-level policy. It does not determine actual entitlement "
-                "or replace human review."
-            )
+            st.caption("A demo score does not guarantee response time or replace human review.")
 
-# ==========================================
-# 10. FOOTER
-# ==========================================
-
+# ---------- FOOTER ----------
 st.divider()
-
 st.caption(
-    "UtilityCare | IMPACTX 2026 | Prototype using demonstration data. "
-    "No real utility, payment, or complaint system is connected."
+    "⚡ UtilityCare | Utilities That Explain Themselves | "
+    "IMPACTX 2026 Prototype"
+)
+st.caption(
+    "Demo environment: no live utility, bank or support integrations. "
+    "Reports are not sent or permanently stored."
 )
